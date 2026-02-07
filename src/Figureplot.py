@@ -9,60 +9,36 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 from re import findall as find
-import re
+
 from datetime import datetime
-import urllib.request
-import urllib.error
+
 today=datetime.today().strftime('%Y%m%d')
 print("Figureplot.py run on ", today)
-class Figureplot:
-    def __init__(self, data_dir='data', output_dir='figures'):
-        self.data_dir = data_dir
-        self.output_dir = output_dir
-        os.makedirs(self.output_dir, exist_ok=True)
 
-    def download_file(self, url, figure_label):
-        """
-        Download a file from an HTTPS link and save it with a figure label.
-        
-        Parameters:
-        -----------
-        url : str
-            The HTTPS URL of the file to download
-        figure_label : str
-            A label for the file (used in the filename)
-            
-        Returns:
-        --------
-        str
-            The path to the downloaded file
-            
-        Raises:
-        -------
-        urllib.error.URLError
-            If the download fails
-        """
-        try:
-            # Extract file extension from URL
-            file_extension = url.split('.')[-1].split('?')[0]
-            
-            # Create filename with figure label and timestamp
-            filename = f"{figure_label}_{today}.{file_extension}"
-            filepath = os.path.join(self.data_dir, filename)
-            
-            # Create data directory if it doesn't exist
-            os.makedirs(self.data_dir, exist_ok=True)
-            
-            # Download the file
-            print(f"Downloading from: {url}")
-            urllib.request.urlretrieve(url, filepath)
-            
-            print(f"File downloaded successfully to: {filepath}")
-            return filepath
-            
-        except urllib.error.URLError as e:
-            print(f"Error downloading file from {url}: {e}")
-            raise
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-            raise
+def setup_figure(
+    figsize=(7, 5.3),
+    dpi=100,
+    font_size=24,
+    savefig_dpi=300,
+    font_family="sans-serif",
+    font_sans="Arial",
+    hide_spines=True,
+    xticks_minor=None,
+    yticks_minor=None,
+):
+    mpl.rcParams.update({
+        "figure.dpi": dpi,
+        "font.size": font_size,
+        "savefig.dpi": savefig_dpi,
+        "font.family": font_family,
+        "font.sans-serif": font_sans,
+    })
+    fig, ax = plt.subplots(figsize=figsize)
+    if hide_spines:
+        ax.spines["right"].set_color("none")
+        ax.spines["top"].set_color("none")
+    if xticks_minor is not None:
+        ax.set_xticks(xticks_minor, minor=True)
+    if yticks_minor is not None:
+        ax.set_yticks(yticks_minor, minor=True)
+    return fig, ax
