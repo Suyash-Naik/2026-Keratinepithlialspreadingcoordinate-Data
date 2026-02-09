@@ -10,6 +10,25 @@ from matplotlib.cm import ScalarMappable
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import LinearSegmentedColormap
 
+# export plots to csv
+
+def export(ax, oname):
+    # get lines
+    out = []
+    for l in ax.lines:
+        out += [
+            ["x - %s" % l.get_label(), *l.get_xdata()],
+            ["y - %s" % l.get_label(), *l.get_ydata()]]
+    # transpose
+    tout = []
+    for i in range(max([len(_) for _ in out])):
+        tout += [[]]
+        for j in range(len(out)):
+            if len(out[j]) > i: tout[-1] += [out[j][i]]
+            else: tout[-1] += [""]
+    # export
+    np.savetxt(oname, tout, delimiter=",", fmt="%s")
+
 # DATA
 
 script_dname = os.path.dirname(os.path.realpath(__file__))
@@ -50,6 +69,18 @@ for beta, label in zip((0, 0.005), ("without", "with")):
     tcut[beta], acut[beta], kcut[beta] = np.transpose(np.genfromtxt(
         "closure_%s.csv" % label,
         delimiter=",", skip_header=1))
+vel_row, disp_row, ang_row = {}, {}, {}
+for title in (
+    "closure_without", "closure_with", "recoil_without", "recoil_with"):
+    vel_row[title], disp_row[title], ang_row[title] = {}, {}, {}
+    for fname in glob("vel_row.%s.t*.csv" % title):
+        time = float(fname.split(".t")[1].split(".csv")[0])
+        vel_row[title][time] = np.genfromtxt(fname,
+            skip_header=1, delimiter=",")
+        disp_row[title][time] = np.genfromtxt(fname.replace("vel", "disp"),
+            skip_header=1, delimiter=",")
+        ang_row[title][time] = np.genfromtxt(fname.replace("vel", "ang"),
+            skip_header=1, delimiter=",")
 
 # experimental keratin distribution
 dist_exp, sdist_exp = {}, {}
@@ -62,13 +93,21 @@ for fname in glob("Results_Pos001_19012023_F*.dist.csv"):
         delimiter=",", skip_header=1)
 
 # numerical keratin distribution
-dist_sim, sdist_sim = {}, {}
+dist_sim, heter_dist_sim, sdist_sim, heter_sdist_sim = {}, {}, {}, {}
 for fname in glob("0.57.t*.dist.csv"):
     time = float(fname.split(".t")[1].split(".dist")[0]) - dt   # shift time
     if time < 2: continue
-    dist_sim[time] = np.genfromtxt(fname,
+    dist_sim[time] = np.genfromtxt(
+        fname,
         delimiter=",", skip_header=1)
-    sdist_sim[time] = np.genfromtxt(fname.replace("dist", "sdist"),
+    sdist_sim[time] = np.genfromtxt(
+        fname.replace("dist", "sdist"),
+        delimiter=",", skip_header=1)
+    heter_dist_sim[time] = np.genfromtxt(
+        "hetera.%s" % fname,
+        delimiter=",", skip_header=1)
+    heter_sdist_sim[time] = np.genfromtxt(
+        ("hetera.%s" % fname).replace("dist", "sdist"),
         delimiter=",", skip_header=1)
 
 # numerical gradients
@@ -131,7 +170,7 @@ plt.rcParams["savefig.dpi"] = 300
 # plt.rcParams["mathtext.default"] = "regular"
 # plt.rcParams["mathtext.fontset"] = "stixsans"
 plt.rcParams["axes.prop_cycle"] = 'cycler(color='\
-    '["#83BB03", "#ff7f0e", "#BB9703", "#D51B66", "#5C2352", "#0173B2"])'
+    '["#83BB03", "#0383bb", "#BB9703", "#D51B66", "#5C2352", "#0173B2"])'
 plt.rcParams["legend.fancybox"] = False
 plt.rcParams["legend.borderaxespad"] = 0
 plt.rcParams["legend.handletextpad"] = 0.4
@@ -159,13 +198,15 @@ plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = prop.get_name()
 
 # rainbow colourmap
-rainbow_cmap = LinearSegmentedColormap.from_list("rainbow", (
-    (0/5, (0.467, 0.000, 0.533)),
-    (1/5, (0.000, 0.298, 1.000)),
-    (2/5, (0.008, 0.506, 0.129)),
-    (3/5, (1.000, 0.933, 0.000)),
-    (4/5, (1.000, 0.553, 0.000)),
-    (5/5, (0.898, 0.000, 0.000))))
+# rainbow_cmap = LinearSegmentedColormap.from_list("rainbow", (
+#     (0/5, (0.467, 0.000, 0.533)),
+#     (1/5, (0.000, 0.298, 1.000)),
+#     (2/5, (0.008, 0.506, 0.129)),
+#     (3/5, (1.000, 0.933, 0.000)),
+#     (4/5, (1.000, 0.553, 0.000)),
+#     (5/5, (0.898, 0.000, 0.000))))
+# rainbow_cmap = plt.cm.viridis
+from batlow import batlow_map as rainbow_cmap
 
 # CUSTOM
 
@@ -191,6 +232,7 @@ ax.add_artist(plt.legend(loc="upper left",
         *ax.get_legend_handles_labels()[0]]))
 
 fig.savefig("velocities_beta0.pdf")
+export(ax, "velocities_beta0.csv")
 
 # velocities beta = 0.005
 
@@ -214,6 +256,7 @@ ax.add_artist(plt.legend(loc="upper right",
         *ax.get_legend_handles_labels()[0]]))
 
 fig.savefig("velocities_beta0.005.pdf")
+export(ax, "velocities_beta0.005.csv")
 
 # velocities sm
 
@@ -241,6 +284,7 @@ ax.add_artist(plt.legend(loc="upper left",
     handles=handles))
 
 fig.savefig("velocities_sm.pdf")
+export(ax, "velocities_sm.csv")
 
 # distribution exp
 
@@ -256,6 +300,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("dist_exp.pdf")
+export(ax, "dist_exp.csv")
 
 # distribution sim
 
@@ -272,6 +317,26 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("dist_sim.pdf")
+export(ax, "dist_sim.csv")
+ylim = ax.get_ylim()
+
+# distribution heterogeneous sim
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Keratin intensity")
+ax.set_xlim([0, 600])
+ax.set_ylabel(r"Probability")
+ax.set_ylim(ylim)
+
+for i, time in enumerate(sorted(dist_sim)):
+    ax.plot(heter_dist_sim[time][:, 0], heter_dist_sim[time][:, 1],
+        color=rainbow_cmap(i/len(heter_dist_sim)), label=r"$T=%.1f$h" % time)
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="upper right"))
+
+fig.savefig("heter_dist_sim.pdf")
+export(ax, "heter_dist_sim.csv")
 
 # PLOTS STRETCH
 
@@ -296,6 +361,7 @@ for beta in (0, 0.005):
     ax.add_artist(plt.legend(loc="upper left"))
 
     fig.savefig("keratin_beta%.3f.pdf" % beta)
+    export(ax, "keratin_beta%.3f.csv" % beta)
 
     # height
 
@@ -314,12 +380,14 @@ for beta in (0, 0.005):
     ax.add_artist(plt.legend(loc="upper left"))
 
     fig.savefig("z_beta%.3f.pdf" % beta)
+    export(ax, "z_beta%.3f.csv" % beta)
 
     # velocity
 
     fig, ax = plt.subplots()
     ax.set_xlabel(r"Time (h)")
     ax.set_ylabel(r"Velocity (µm/min)")
+    ax.set_ylim([0, 8])
 
     for fpull in sorted(dzdt[beta]):
         time, meandzdt, stddzdt = np.transpose(dzdt[beta][fpull])
@@ -329,9 +397,14 @@ for beta in (0, 0.005):
             color=l.get_color(), alpha=0.3)
 
     plt.sca(ax)
-    ax.add_artist(plt.legend(loc="upper left" if beta == 0 else "upper right"))
+    ax.add_artist(plt.legend(loc="upper right",
+        handles=[
+            Line2D([0], [0], lw=0),
+            Line2D([0], [0], lw=0, label=r"$\beta=%s$" % beta),
+            *ax.get_legend_handles_labels()[0]]))
 
     fig.savefig("dzdt_beta%.3f.pdf" % beta)
+    export(ax, "dzdt_beta%.3f.csv" % beta)
 
 # pressure vs. keratin
 
@@ -354,6 +427,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
 fig.savefig("pressure_vs_keratin.pdf")
+export(ax, "pressure_vs_keratin.csv")
 
 # tension gradient
 
@@ -380,6 +454,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right", ncols=3))
 
 fig.savefig("hist_tension_radius_sim.pdf")
+export(ax, "hist_tension_radius_sim.csv")
 
 # keratin gradient
 
@@ -406,6 +481,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
 fig.savefig("hist_keratin_radius_sim.pdf")
+export(ax, "hist_keratin_radius_sim.csv")
 
 # pressure gradient
 
@@ -433,6 +509,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
 fig.savefig("hist_pressure_radius_sim.pdf")
+export(ax, "hist_pressure_radius_sim.csv")
 
 # keratin on area gradient
 
@@ -459,6 +536,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
 fig.savefig("hist_keratin_area_sim.pdf")
+export(ax, "hist_keratin_area_sim.csv")
 
 # PLOTS CUT
 
@@ -477,6 +555,252 @@ plt.sca(ax)
 ax.add_artist(plt.legend())
 
 fig.savefig("area_cut.pdf")
+export(ax, "area_cut.csv")
+
+# velocity closure
+
+for title in ("closure_with", "closure_without"):
+
+    beta = 0 if "without" in title else 0.005
+    gamma = 0 if "recoil" in title else 2
+
+    fig, ax = plt.subplots()
+    ax.set_xlabel(r"Row index")
+    ax.set_xlim([0, 3])
+    ax.set_xticks(range(4))
+    ax.set_xticklabels(range(1, 5))
+    ax.set_ylabel(r"Average velocity (µm/s)")
+    ax.set_ylim([0, 0.5])
+
+    axins = ax.inset_axes([0.5, 0.5, 0.47, 0.47],
+        xlim=ax.get_xlim(), ylim=[0, 4])
+    axins.set_xticks(ax.get_xticks())
+    axins.set_xticklabels(ax.get_xticklabels())
+    axins.set_yticks(range(5))
+
+    for t in (
+        (sorted(vel_row[title])[0],) if "recoil" in title else
+        sorted(vel_row[title])[::2]):
+        c = rainbow_cmap(
+            list(sorted(vel_row[title])).index(t)/(len(vel_row[title]) - 1))
+        ax.plot(vel_row[title][t],
+            color=c, marker="o", label=r"t=%is" % round(t))
+        axins.plot(vel_row[title][t],
+            color=c, marker="o")
+
+    plt.sca(ax)
+    ax.add_artist(plt.legend(loc="lower left"))
+    ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+        handles=[
+            Line2D([0], [0], lw=0, label=r"β=%s, γ=%s" % (beta, gamma))]))
+
+    fig.savefig("vel_row.%s.pdf" % title)
+    export(ax, "vel_row.%s.csv" % title)
+
+# velocity recoil
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"Average velocity (µm/s)")
+# ax.set_ylim([0, 0.5])
+
+# axins = ax.inset_axes([0.5, 0.5, 0.47, 0.47],
+#     xlim=ax.get_xlim(), ylim=[0, 4])
+# axins.set_xticks(ax.get_xticks())
+# axins.set_yticks(range(5))
+
+for title in ("recoil_with", "recoil_without"):
+    beta = 0 if "without" in title else 0.005
+    for t in (sorted(vel_row[title])[0],):
+        try: assert t0 == t
+        except NameError: t0 = t
+        l, = ax.plot(vel_row[title][t],
+            marker="o", label=r"β=%s" % beta)
+#         axins.plot(vel_row[title][t],
+#             color=l.get_color(), marker="o")
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="lower left"))
+ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
+del t0
+
+fig.savefig("vel_row.recoil.pdf")
+export(ax, "vel_row.recoil.csv")
+
+# displacement closure
+
+for title in ("closure_with", "closure_without"):
+
+    beta = 0 if "without" in title else 0.005
+    gamma = 0 if "recoil" in title else 2
+
+    fig, ax = plt.subplots()
+    ax.set_xlabel(r"Row index")
+    ax.set_xlim([0, 3])
+    ax.set_xticks(range(4))
+    ax.set_xticklabels(range(1, 5))
+    ax.set_ylabel(r"displacement (µm)")
+    ax.set_ylim([0, 35])
+
+    for t in (
+        (sorted(disp_row[title])[0],) if "recoil" in title else
+        sorted(disp_row[title])[::2]):
+        c = rainbow_cmap(
+            list(sorted(disp_row[title])).index(t)/(len(disp_row[title]) - 1))
+        ax.plot(disp_row[title][t],
+            color=c, marker="o", label=r"t=%is" % round(t))
+
+    plt.sca(ax)
+    ax.add_artist(plt.legend(loc="center right"))
+    ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+        handles=[
+            Line2D([0], [0], lw=0, label=r"β=%s, γ=%s" % (beta, gamma))]))
+
+    fig.savefig("disp_row.%s.pdf" % title)
+    export(ax, "disp_row.%s.csv" % title)
+
+# difference displacement closure
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"displacement diff.""\n"r"[WT - MO] (µm)")
+
+ax.axhline(y=0, color="black", linestyle="--")
+for t in sorted(disp_row[title])[::2]:
+    c = rainbow_cmap(
+        list(sorted(disp_row[title])).index(t)/(len(disp_row[title]) - 1))
+    ax.plot(disp_row["closure_with"][t] - disp_row["closure_without"][t],
+        color=c, marker="o", label=r"t=%is" % round(t))
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="lower right"))
+ax.add_artist(plt.legend(loc="upper center", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=2")]))
+
+fig.savefig("diff_disp_row.closure.pdf")
+export(ax, "diff_disp_row.closure.csv")
+
+# displacement recoil
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"displacement (µm)")
+
+for title in ("recoil_with", "recoil_without"):
+    beta = 0 if "without" in title else 0.005
+    for t in (sorted(disp_row[title])[0],):
+        try: assert t0 == t
+        except NameError: t0 = t
+        l, = ax.plot(disp_row[title][t],
+            marker="o", label=r"β=%s" % beta)
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="lower left"))
+ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
+del t0
+
+fig.savefig("disp_row.recoil.pdf")
+export(ax, "disp_row.recoil.csv")
+
+# difference displacement recoil
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"displacement diff.""\n"r"[WT - MO] (µm)")
+
+ax.axhline(y=0, color="black", linestyle="--")
+for t in sorted(disp_row[title])[::2]:
+    c = rainbow_cmap(
+        list(sorted(disp_row[title])).index(t)/(len(disp_row[title]) - 1))
+    ax.plot(disp_row["recoil_with"][t] - disp_row["recoil_without"][t],
+        color=c, marker="o", label=r"t=%is" % round(t))
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="upper right"))
+ax.add_artist(plt.legend(loc="upper center", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=0")]))
+
+fig.savefig("diff_disp_row.recoil.pdf")
+export(ax, "diff_disp_row.recoil.csv")
+
+# angle closure
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"Alignment angle (°)")
+ax.set_ylim([0, 90])
+
+ax.axhline(y=45, color="black", linestyle="--")
+
+for title in ("closure_with", "closure_without"):
+    beta = 0 if "without" in title else 0.005
+    for t in sorted(ang_row[title]):
+        if round(t) != 60: continue
+        try: assert t0 == t
+        except NameError: t0 = t
+        l, = ax.plot(ang_row[title][t],
+            marker="o", label=r"β=%s" % beta)
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="upper left"))
+ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=2, t=%is" % round(t0))]))
+del t0
+
+fig.savefig("ang_row.closure.pdf")
+export(ax, "ang_row.closure.csv")
+
+# angle recoil
+
+fig, ax = plt.subplots()
+ax.set_xlabel(r"Row index")
+ax.set_xlim([0, 3])
+ax.set_xticks(range(4))
+ax.set_xticklabels(range(1, 5))
+ax.set_ylabel(r"Alignment angle (°)")
+ax.set_ylim([0, 90])
+
+ax.axhline(y=45, color="black", linestyle="--")
+
+for title in ("recoil_with", "recoil_without"):
+    beta = 0 if "without" in title else 0.005
+    for t in (sorted(ang_row[title])[0],):
+        try: assert t0 == t
+        except NameError: t0 = t
+        l, = ax.plot(ang_row[title][t],
+            marker="o", label=r"β=%s" % beta)
+
+plt.sca(ax)
+ax.add_artist(plt.legend(loc="lower left"))
+ax.add_artist(plt.legend(loc="upper right", fontsize="small",
+    handles=[
+        Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
+del t0
+
+fig.savefig("ang_row.recoil.pdf")
+export(ax, "ang_row.recoil.csv")
 
 # PLOTS PIPETTE
 
@@ -508,6 +832,7 @@ cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
 fig.savefig("keratin_pipette.pdf")
+export(ax, "keratin_pipette.csv")
 
 # height
 
@@ -530,6 +855,7 @@ cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
 fig.savefig("height_pipette.pdf")
+export(ax, "height_pipette.csv")
 
 # velocities
 
@@ -555,6 +881,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("velocities_pipette.pdf")
+export(ax, "velocities_pipette.csv")
 
 # times measured
 
@@ -578,6 +905,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("times_measured_pipette.pdf")
+export(ax, "times_measured_pipette.csv")
 
 # times computed
 
@@ -601,6 +929,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("times_computed_pipette.pdf")
+export(ax, "times_computed_pipette.csv")
 
 # elastic constant
 
@@ -624,6 +953,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
 fig.savefig("springk_pipette.pdf")
+export(ax, "springk_pipette.csv")
 
 # residual tension
 
@@ -644,6 +974,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("tension_pipette.pdf")
+export(ax, "tension_pipette.csv")
 
 # substrate friction
 
@@ -663,6 +994,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 fig.savefig("friction_pipette.pdf")
+export(ax, "friction_pipette.csv")
 
 # fit
 
@@ -701,6 +1033,7 @@ ax.plot(height_pipette[time][:, 0], height_pipette[time][:, 1],
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="lower right"))
 fig.savefig("fit_pipette.pdf")
+export(ax, "fit_pipette.csv")
 
 # SHOW
 
