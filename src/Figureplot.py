@@ -74,6 +74,45 @@ def extract_time_idx(path):
     return int(matches[-1]) if matches else 0
 
 
+def intensity_data_sorting(
+    folders,
+    earlyfiles,
+    file_glob="*.csv",
+    delimiter=r"[;,]",
+    mean_col="Mean",
+    skip_rows=10,
+):
+    data = []
+    earlyindex = []
+    current_index = 0
+    for folder in folders:
+        files = sorted(glob(os.path.join(folder, file_glob)))
+        for file in files:
+            pos_match = find(r"Pos\d{2,3}", file)
+            pos = pos_match[0] if pos_match else "Pos000"
+
+            date_match = find(r"\d{8}", file)
+            date = date_match[0] if date_match else "unknown"
+
+            fid = f"{date}_{pos}"
+            if fid in earlyfiles:
+                earlyindex.append(current_index)
+            current_index += 1
+
+            df = pd.read_csv(file, delimiter=delimiter, engine="python")
+            df = df.iloc[1::2].reset_index(drop=True)
+            if skip_rows:
+                df = df.iloc[skip_rows:]
+
+            pipmax = np.max(df[mean_col])
+            pipmin = np.min(df[mean_col])
+
+            data.append([fid, pipmin, pipmax])
+
+    data = np.array(data, dtype=object).T
+    return data, earlyindex
+
+
 def build_nd_raw_dataset(
     ndfolders,
     time_minutes,
