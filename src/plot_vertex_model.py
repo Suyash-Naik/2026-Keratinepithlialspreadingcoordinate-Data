@@ -173,6 +173,7 @@ plt.rcParams["savefig.dpi"] = 300
 plt.rcParams["axes.prop_cycle"] = 'cycler(color='\
     '["#83BB03", "#0383bb", "#BB9703", "#D51B66", "#5C2352", "#0173B2"])'
 plt.rcParams["legend.fancybox"] = False
+plt.rcParams["legend.frameon"] = False
 plt.rcParams["legend.borderaxespad"] = 0
 plt.rcParams["legend.handletextpad"] = 0.4
 plt.rcParams["legend.labelspacing"] = 0.25
