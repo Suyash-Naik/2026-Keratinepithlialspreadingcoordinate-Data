@@ -1,4 +1,4 @@
-import os
+import os, sys
 import numpy as np
 from glob import glob
 
@@ -32,7 +32,8 @@ def export(ax, oname):
 # DATA
 
 script_dname = os.path.dirname(os.path.realpath(__file__))
-os.chdir(os.path.join(script_dname, "data_vertex_model"))
+data_dname = os.path.join(script_dname, "..", "data_vertex_model")
+os.chdir(data_dname)
 
 dt = 2. # shift in time scale in hours
 
@@ -206,7 +207,17 @@ plt.rcParams["font.sans-serif"] = prop.get_name()
 #     (4/5, (1.000, 0.553, 0.000)),
 #     (5/5, (0.898, 0.000, 0.000))))
 # rainbow_cmap = plt.cm.viridis
+sys.path.append(script_dname)
 from batlow import batlow_map as rainbow_cmap
+
+# OUTPUT DIRECTORY
+
+from shutil import rmtree
+output_dname = os.path.join(data_dname, "output")
+try: rmtree(output_dname)
+except FileNotFoundError: pass
+os.mkdir(output_dname)
+os.chdir(output_dname)
 
 # CUSTOM
 

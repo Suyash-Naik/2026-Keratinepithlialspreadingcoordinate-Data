@@ -11,3 +11,5 @@ notebooks/.ipynb_checkpoints/
 .env
 .venv
 __pycache__/
+data_vertex_model/output
+**/.*.sw*
