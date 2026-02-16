@@ -13,3 +13,4 @@ notebooks/.ipynb_checkpoints/
 __pycache__/
 data_vertex_model/output
 **/.*.sw*
+data/*/*/*/Processed
