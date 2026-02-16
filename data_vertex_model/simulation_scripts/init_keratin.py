@@ -7,12 +7,15 @@ import matplotlib.pyplot as plt
 
 # READ
 
+# load initial disordered configuration
 with open("init_disordered.p", "rb") as dump:
     vm = pickle.load(dump)
 
+# remove all forces
 for _ in vm.vertexForces: vm.removeVertexForce(_)
 for _ in vm.halfEdgeForces: vm.removeHalfEdgeForce(_)
 
+# compute areas of cells in input configuration
 areas = np.array(list(map(
     lambda i: vm.getVertexToNeighboursArea(i),
     vm.getVertexIndicesByType("centre"))))
@@ -34,20 +37,18 @@ ron = 0
 p0 = 3.72
 
 # initialisation parameters
-meanK = 100
-meanA = 1750
-# meanRatio = 0.04
+meanK = 100     # target mean keratin value
+meanA = 1750    # target mean area
 meanRatio = (-1 + np.sqrt((4*meanK)/(alpha*Gamma)))/8
-# print(meanRatio); exit()
 
-# change mean radius
+# scale system to change mean area
 vm.scale(np.sqrt(meanA/areas.mean()))
 
 # add keratin
-beta, tau = 0, np.inf   # do not close loop and do not relax target areas
-vm.setOverdampedIntegrator(
+beta, tau = 0, np.inf           # do not close loop and do not relax target areas
+vm.setOverdampedIntegrator(     # add overdamped integrator with drag coefficient xi
     xi)
-vm.addKeratinModel("keratin",
+vm.addKeratinModel("keratin",   # load keratin model
     Gamma/A0, A0, tau, Gamma, p0, alpha, beta, kth, tauK, sigma, ron)
 
 # change target areas
@@ -63,19 +64,12 @@ vm.vertexForces["keratin"].keratin = dict(map(
 
 # SAVE
 
+# output configuration with keratin model and desired areas
 with open("init_keratin.p", "wb") as dump:
     pickle.dump(vm, dump)
 
 # PLOT
 
 fig, ax = plot(vm, kmax=400)
-
-# (
-#     lambda vertices: list(map(
-#         lambda i: ax.text(*vertices[i].position, i),
-#         vm.getVertexIndicesByType("centre"))))(
-#     vm.vertices)
-# _update_canvas(fig)
-
 plt.show()
 
