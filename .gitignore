@@ -14,3 +14,6 @@ __pycache__/
 data_vertex_model/output
 **/.*.sw*
 data/*/*/*/Processed
+node_modules/
+package-lock.json
+package.json
