@@ -67,6 +67,8 @@ class BinnedIntensityPlotter:
             posnumber = int(posstr)
             if "Control" in file or "control" in file:
                 treatment = "Control"
+            elif "K4K8MO" in file or "k4k8mo" in file:
+                treatment = "K4K8MO"
             elif "MyptYsl" in file or "Myptysl" in file:
                 treatment = "caMypt"
             elif "caRhoA" in file:

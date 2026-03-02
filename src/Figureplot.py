@@ -189,10 +189,10 @@ def plot_nd_surface(
     grid_res=60,
     method="linear",
     cmap="viridis",
-    figsize=(7, 5.3),
-    dpi=100,
-    font_size=16,
-    sigma=10
+    fig=None,
+    ax=None,
+    sigma=10,
+    colname=False,
 ):
     """Create a 3D surface from long-form data using grid interpolation."""
     x = data[x_col].to_numpy()
@@ -211,7 +211,7 @@ def plot_nd_surface(
     grid_x, grid_y = np.meshgrid(xi, yi)
     grid_z = griddata((x, y), z, (grid_x, grid_y), method=method)
     grid_z = gaussian_filter(grid_z, sigma=sigma) 
-    fig, ax = setup3d_figure(figsize=figsize, dpi=dpi, font_size=font_size)
+    
     surf = ax.plot_surface(
         grid_x,
         grid_y,
@@ -220,9 +220,10 @@ def plot_nd_surface(
         linewidth=0,
         antialiased=True,
     )
-    ax.set_xlabel(x_col)
-    ax.set_ylabel(y_col)
-    ax.set_zlabel(z_col)
-    fig.colorbar(surf, ax=ax, shrink=0.6, aspect=12, pad=0.1)
+    if colname:
+        ax.set_xlabel(x_col)
+        ax.set_ylabel(y_col)
+        ax.set_zlabel(z_col)
+    #fig.colorbar(surf, ax=ax, shrink=0.6, aspect=12, pad=0.1)
     return fig, ax, surf
 
