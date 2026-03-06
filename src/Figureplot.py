@@ -105,7 +105,8 @@ def intensity_data_sorting(
                 df = df.iloc[skip_rows:]
 
             pipmax = np.max(df[mean_col])
-            pipmin = np.min(df[mean_col])
+            positive = df.loc[df[mean_col].gt(0), mean_col]
+            pipmin = positive.min() if not positive.empty else np.nan
 
             data.append([fid, pipmin, pipmax])
 
@@ -195,6 +196,8 @@ def plot_nd_surface(
     colname=False,
 ):
     """Create a 3D surface from long-form data using grid interpolation."""
+    if ax is None:
+        fig, ax = setup3d_figure()
     x = data[x_col].to_numpy()
     y = data[y_col].to_numpy()
     z = data[z_col].to_numpy()
