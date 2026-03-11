@@ -69,6 +69,13 @@ The figures and plots use the following style elements which you would need to h
 
 ### How to use Spanselection
 
+Spanselection.py was developed to analyze heightmaps from pipette asipration data and fit the asipration and retract curves automatically. The goal of this function is to ease analysis of pipette aspiration or other such that and provide fits directly in python with a simple gui. It can be run with the command `pixi run python src/Spanselection`. It opens a window where the same graph is represented two allowing 
+
+- #1 To fit the aspiration curves
+
+- #2 To fit the retract curves
+
+
 ## Badges
 
 These badges indicate the main tools, environments, and dependencies used in the analyses:
