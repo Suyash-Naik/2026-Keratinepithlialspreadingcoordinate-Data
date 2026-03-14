@@ -5,7 +5,8 @@ platforms = ["linux-64","win-64","osx-64"]
 version = "0.1.0"
 
 [tasks]
-jupserve = "jupyter lab --no-browser --ip=127.0.0.1 --IdentityProvider.token='' --ServerApp.password=''"
+jupserve = "jupyter lab --no-browser --ip=127.0.0.1"
+statsserver = { cmd = "jupyter lab --no-browser --ip=127.0.0.1", default-environment = "statsmodels" }
 
 [dependencies]
 python = ">=3.13.11,<3.14"
@@ -40,4 +41,21 @@ ffmpeg = ">=1.4, <2"
 holoviews = ">=1.22.1, <2"
 patchify = ">=0.1.1, <0.2"
 ngio = ">=0.1.6, <0.2"
+statsmodels = ">=0.14.6, <0.15"
 
+[feature.statsmodels]
+platforms = ["osx-64", "win-64"]
+
+[feature.statsmodels.dependencies]
+python = ">=3.13,<3.14"
+jupyter = "*"
+scipy = "*"
+scikit-learn = "*"
+pandas = "*"
+numpy = "*"
+matplotlib = "*"
+seaborn = "*"
+statsmodels = "*"
+
+[environments]
+statsmodels = { features = ["statsmodels"], no-default-feature = true }
