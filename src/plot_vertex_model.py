@@ -35,6 +35,10 @@ script_dname = os.path.dirname(os.path.realpath(__file__))
 data_dname = os.path.join(script_dname, "..", "data_vertex_model")
 os.chdir(data_dname)
 
+def save(name, ax):
+    fig.savefig("%s.pdf" % name)
+    export(ax, "%s.csv" % name)
+
 dt = 2. # shift in time scale in hours
 
 alpha = 4000
@@ -243,8 +247,7 @@ ax.add_artist(plt.legend(loc="upper left",
         Line2D([0], [0], lw=0, label=r"$\beta=%s$" % beta),
         *ax.get_legend_handles_labels()[0]]))
 
-fig.savefig("velocities_beta0.pdf")
-export(ax, "velocities_beta0.csv")
+save("velocities_beta0", ax)
 
 # velocities beta = 0.005
 
@@ -267,8 +270,7 @@ ax.add_artist(plt.legend(loc="upper right",
         Line2D([0], [0], lw=0, label=r"$\beta=%s$" % beta),
         *ax.get_legend_handles_labels()[0]]))
 
-fig.savefig("velocities_beta0.005.pdf")
-export(ax, "velocities_beta0.005.csv")
+save("velocities_beta0.005", ax)
 
 # velocities sm
 
@@ -295,8 +297,7 @@ for beta in sorted(l):
 ax.add_artist(plt.legend(loc="upper left",
     handles=handles))
 
-fig.savefig("velocities_sm.pdf")
-export(ax, "velocities_sm.csv")
+save("velocities_sm", ax)
 
 # distribution exp
 
@@ -311,8 +312,8 @@ for i, time in enumerate(sorted(dist_exp)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("dist_exp.pdf")
-export(ax, "dist_exp.csv")
+save("dist_exp", ax)
+save("fig6K", ax)
 
 # distribution sim
 
@@ -328,8 +329,9 @@ for i, time in enumerate(sorted(dist_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("dist_sim.pdf")
-export(ax, "dist_sim.csv")
+save("dist_sim", ax)
+save("fig6J", ax)
+save("fig14C", ax)
 ylim = ax.get_ylim()
 
 # distribution heterogeneous sim
@@ -347,8 +349,8 @@ for i, time in enumerate(sorted(dist_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("heter_dist_sim.pdf")
-export(ax, "heter_dist_sim.csv")
+save("heter_dist_sim", ax)
+save("figSM14D", ax)
 
 # PLOTS STRETCH
 
@@ -372,8 +374,8 @@ for beta in (0, 0.005):
     plt.sca(ax)
     ax.add_artist(plt.legend(loc="upper left"))
 
-    fig.savefig("keratin_beta%.3f.pdf" % beta)
-    export(ax, "keratin_beta%.3f.csv" % beta)
+    save("keratin_beta%.3f" % beta, ax)
+    if beta == 0.005: save("fig6M", ax)
 
     # height
 
@@ -391,15 +393,14 @@ for beta in (0, 0.005):
     plt.sca(ax)
     ax.add_artist(plt.legend(loc="upper left"))
 
-    fig.savefig("z_beta%.3f.pdf" % beta)
-    export(ax, "z_beta%.3f.csv" % beta)
+    save("z_beta%.3f" % beta, ax)
 
     # velocity
 
     fig, ax = plt.subplots()
     ax.set_xlabel(r"Time (h)")
     ax.set_ylabel(r"Velocity (µm/min)")
-    ax.set_ylim([0, 8])
+    #ax.set_ylim([0, 8])
 
     for fpull in sorted(dzdt[beta]):
         time, meandzdt, stddzdt = np.transpose(dzdt[beta][fpull])
@@ -409,14 +410,15 @@ for beta in (0, 0.005):
             color=l.get_color(), alpha=0.3)
 
     plt.sca(ax)
-    ax.add_artist(plt.legend(loc="upper right",
+    ax.add_artist(plt.legend(loc="upper left" if beta == 0 else "upper right",
         handles=[
             Line2D([0], [0], lw=0),
             Line2D([0], [0], lw=0, label=r"$\beta=%s$" % beta),
             *ax.get_legend_handles_labels()[0]]))
 
-    fig.savefig("dzdt_beta%.3f.pdf" % beta)
-    export(ax, "dzdt_beta%.3f.csv" % beta)
+    save("dzdt_beta%.3f" % beta, ax)
+    if beta == 0: save("fig6O", ax)
+    elif beta == 0.005: save("fig6N", ax)
 
 # pressure vs. keratin
 
@@ -438,8 +440,8 @@ ax.plot(ax.get_xlim(), ax.get_xlim(),
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
-fig.savefig("pressure_vs_keratin.pdf")
-export(ax, "pressure_vs_keratin.csv")
+save("pressure_vs_keratin", ax)
+save("figSM12C", ax)
 
 # tension gradient
 
@@ -465,8 +467,7 @@ for i, time in enumerate(sorted(hist_tension_radius_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right", ncols=3))
 
-fig.savefig("hist_tension_radius_sim.pdf")
-export(ax, "hist_tension_radius_sim.csv")
+save("hist_tension_radius_sim", ax)
 
 # keratin gradient
 
@@ -492,8 +493,8 @@ for i, time in enumerate(sorted(hist_keratin_radius_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
-fig.savefig("hist_keratin_radius_sim.pdf")
-export(ax, "hist_keratin_radius_sim.csv")
+save("hist_keratin_radius_sim", ax)
+save("figSM12A", ax)
 
 # pressure gradient
 
@@ -520,8 +521,8 @@ for i, time in enumerate(sorted(hist_pressure_radius_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
-fig.savefig("hist_pressure_radius_sim.pdf")
-export(ax, "hist_pressure_radius_sim.csv")
+save("hist_pressure_radius_sim", ax)
+save("figSM12B", ax)
 
 # keratin on area gradient
 
@@ -547,8 +548,7 @@ for i, time in enumerate(sorted(hist_keratin_area_sim)):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
-fig.savefig("hist_keratin_area_sim.pdf")
-export(ax, "hist_keratin_area_sim.csv")
+save("hist_keratin_area_sim", ax)
 
 # PLOTS CUT
 
@@ -566,8 +566,8 @@ for beta in sorted(acut)[::-1]:
 plt.sca(ax)
 ax.add_artist(plt.legend())
 
-fig.savefig("area_cut.pdf")
-export(ax, "area_cut.csv")
+save("area_cut", ax)
+save("fig6E", ax)
 
 # velocity closure
 
@@ -606,8 +606,7 @@ for title in ("closure_with", "closure_without"):
         handles=[
             Line2D([0], [0], lw=0, label=r"β=%s, γ=%s" % (beta, gamma))]))
 
-    fig.savefig("vel_row.%s.pdf" % title)
-    export(ax, "vel_row.%s.csv" % title)
+    save("vel_row.%s" % title, ax)
 
 # velocity recoil
 
@@ -641,8 +640,8 @@ ax.add_artist(plt.legend(loc="upper right", fontsize="small",
         Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
 del t0
 
-fig.savefig("vel_row.recoil.pdf")
-export(ax, "vel_row.recoil.csv")
+save("vel_row.recoil", ax)
+save("fig6F", ax)
 
 # displacement closure
 
@@ -673,8 +672,9 @@ for title in ("closure_with", "closure_without"):
         handles=[
             Line2D([0], [0], lw=0, label=r"β=%s, γ=%s" % (beta, gamma))]))
 
-    fig.savefig("disp_row.%s.pdf" % title)
-    export(ax, "disp_row.%s.csv" % title)
+    save("disp_row.%s" % title, ax)
+    if beta == 0: save("fig6H", ax)
+    elif beta == 0.005: save("fig6G", ax)
 
 # difference displacement closure
 
@@ -698,8 +698,8 @@ ax.add_artist(plt.legend(loc="upper center", fontsize="small",
     handles=[
         Line2D([0], [0], lw=0, label=r"γ=2")]))
 
-fig.savefig("diff_disp_row.closure.pdf")
-export(ax, "diff_disp_row.closure.csv")
+save("diff_disp_row.closure", ax)
+save("fig6I", ax)
 
 # displacement recoil
 
@@ -725,8 +725,7 @@ ax.add_artist(plt.legend(loc="upper right", fontsize="small",
         Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
 del t0
 
-fig.savefig("disp_row.recoil.pdf")
-export(ax, "disp_row.recoil.csv")
+save("disp_row.recoil", ax)
 
 # difference displacement recoil
 
@@ -750,8 +749,7 @@ ax.add_artist(plt.legend(loc="upper center", fontsize="small",
     handles=[
         Line2D([0], [0], lw=0, label=r"γ=0")]))
 
-fig.savefig("diff_disp_row.recoil.pdf")
-export(ax, "diff_disp_row.recoil.csv")
+save("diff_disp_row.recoil", ax)
 
 # angle closure
 
@@ -781,8 +779,7 @@ ax.add_artist(plt.legend(loc="upper right", fontsize="small",
         Line2D([0], [0], lw=0, label=r"γ=2, t=%is" % round(t0))]))
 del t0
 
-fig.savefig("ang_row.closure.pdf")
-export(ax, "ang_row.closure.csv")
+save("ang_row.closure", ax)
 
 # angle recoil
 
@@ -811,8 +808,7 @@ ax.add_artist(plt.legend(loc="upper right", fontsize="small",
         Line2D([0], [0], lw=0, label=r"γ=0, t=%is" % round(t0))]))
 del t0
 
-fig.savefig("ang_row.recoil.pdf")
-export(ax, "ang_row.recoil.csv")
+save("ang_row.recoil", ax)
 
 # PLOTS PIPETTE
 
@@ -843,8 +839,9 @@ cax.xaxis.set_ticks_position("bottom")
 cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
-fig.savefig("keratin_pipette.pdf")
-export(ax, "keratin_pipette.csv")
+save("keratin_pipette", ax)
+save("figSM8B", ax)
+save("fig5B", ax)
 
 # height
 
@@ -866,8 +863,9 @@ cax.xaxis.set_ticks_position("bottom")
 cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
-fig.savefig("height_pipette.pdf")
-export(ax, "height_pipette.csv")
+save("height_pipette", ax)
+save("figSM8A", ax)
+save("fig5A", ax)
 
 # velocities
 
@@ -892,8 +890,8 @@ for v, marker, label in zip(
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("velocities_pipette.pdf")
-export(ax, "velocities_pipette.csv")
+save("velocities_pipette", ax)
+save("figSM9B", ax)
 
 # times measured
 
@@ -916,8 +914,8 @@ for t, marker, label in zip(
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("times_measured_pipette.pdf")
-export(ax, "times_measured_pipette.csv")
+save("times_measured_pipette", ax)
+save("figSM9A", ax)
 
 # times computed
 
@@ -940,8 +938,8 @@ for t, marker, label in zip(
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("times_computed_pipette.pdf")
-export(ax, "times_computed_pipette.csv")
+save("times_computed_pipette", ax)
+save("figSM9C", ax)
 
 # elastic constant
 
@@ -964,8 +962,8 @@ for sk in (1e3*springk,):
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
-fig.savefig("springk_pipette.pdf")
-export(ax, "springk_pipette.csv")
+save("springk_pipette", ax)
+save("figSM9D", ax)
 
 # residual tension
 
@@ -985,8 +983,8 @@ ax.axhline(y=0, color="black", linestyle="--")
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("tension_pipette.pdf")
-export(ax, "tension_pipette.csv")
+save("tension_pipette", ax)
+save("figSM9F", ax)
 
 # substrate friction
 
@@ -1005,8 +1003,8 @@ ax.fill_between(ax.get_xlim(),
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
-fig.savefig("friction_pipette.pdf")
-export(ax, "friction_pipette.csv")
+save("friction_pipette", ax)
+save("figSM9E", ax)
 
 # fit
 
@@ -1044,8 +1042,9 @@ ax.plot(height_pipette[time][:, 0], height_pipette[time][:, 1],
 
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="lower right"))
-fig.savefig("fit_pipette.pdf")
-export(ax, "fit_pipette.csv")
+save("fit_pipette", ax)
+save("figSM8C", ax)
+save("fig5C", ax)
 
 # SHOW
 
