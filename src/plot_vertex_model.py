@@ -350,7 +350,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("heter_dist_sim", ax)
-save("figSM14D", ax)
+save("figSM12D", ax)
 
 # PLOTS STRETCH
 
@@ -441,7 +441,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
 save("pressure_vs_keratin", ax)
-save("figSM12C", ax)
+save("figSM10C", ax)
 
 # tension gradient
 
@@ -494,7 +494,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
 save("hist_keratin_radius_sim", ax)
-save("figSM12A", ax)
+save("figSM10A", ax)
 
 # pressure gradient
 
@@ -522,7 +522,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left", ncols=3))
 
 save("hist_pressure_radius_sim", ax)
-save("figSM12B", ax)
+save("figSM10B", ax)
 
 # keratin on area gradient
 
@@ -840,7 +840,7 @@ cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
 save("keratin_pipette", ax)
-save("figSM8B", ax)
+save("figSM6B", ax)
 save("fig5B", ax)
 
 # height
@@ -864,7 +864,7 @@ cbar.set_label(r"Hours post fertilisation", labelpad=5)
 ax.figure.subplots_adjust(top=0.925)
 
 save("height_pipette", ax)
-save("figSM8A", ax)
+save("figSM6A", ax)
 save("fig5A", ax)
 
 # velocities
@@ -891,7 +891,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("velocities_pipette", ax)
-save("figSM9B", ax)
+save("figSM7B", ax)
 
 # times measured
 
@@ -915,7 +915,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("times_measured_pipette", ax)
-save("figSM9A", ax)
+save("figSM7A", ax)
 
 # times computed
 
@@ -939,7 +939,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("times_computed_pipette", ax)
-save("figSM9C", ax)
+save("figSM7C", ax)
 
 # elastic constant
 
@@ -963,7 +963,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper left"))
 
 save("springk_pipette", ax)
-save("figSM9D", ax)
+save("figSM7D", ax)
 
 # residual tension
 
@@ -984,7 +984,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("tension_pipette", ax)
-save("figSM9F", ax)
+save("figSM7F", ax)
 
 # substrate friction
 
@@ -1004,7 +1004,7 @@ plt.sca(ax)
 ax.add_artist(plt.legend(loc="upper right"))
 
 save("friction_pipette", ax)
-save("figSM9E", ax)
+save("figSM7E", ax)
 
 # fit
 
@@ -1043,7 +1043,7 @@ ax.plot(height_pipette[time][:, 0], height_pipette[time][:, 1],
 plt.sca(ax)
 ax.add_artist(plt.legend(loc="lower right"))
 save("fit_pipette", ax)
-save("figSM8C", ax)
+save("figSM6C", ax)
 save("fig5C", ax)
 
 # SHOW
