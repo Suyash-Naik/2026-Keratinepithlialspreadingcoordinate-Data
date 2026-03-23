@@ -33,6 +33,8 @@ This repository is organized as described in the tree below. A brief description
 │   ├── BinnedPlotter.py                            # Bin intensity data over time and plot Figure intensity traces
 │   ├── Spanselection_pipette.py                    # A nifty script I made to analyze pipette aspiration data (span selection + fitting)
 │   ├── plot_vertex_model.py                        # Plots all the panels of the vertex model data. Author: Yann-Edwin Keta
+│   ├── epiboly_dynamics_archive.py                 # Plots mean-field predictions of epiboly dynamics. Author: Silke Henkes
+│   ├── pipette_dynamics_parvary_archive.py         # Plots mean-field predictions of pipette dynamics. Author: Silke Henkes
 │   ├── batlow.py                                   # Scientific colormap. Author: Fabio Crameri
 │   └── Figureplot.py                               # Planned figureplot function
 └── .gitignore
