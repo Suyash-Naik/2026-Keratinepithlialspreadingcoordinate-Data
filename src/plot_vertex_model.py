@@ -36,7 +36,7 @@ data_dname = os.path.join(script_dname, "..", "data_vertex_model")
 os.chdir(data_dname)
 
 def save(name, ax):
-    fig.savefig("%s.pdf" % name)
+    ax.get_figure().savefig("%s.pdf" % name)
     export(ax, "%s.csv" % name)
 
 dt = 2. # shift in time scale in hours
