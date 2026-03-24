@@ -116,7 +116,7 @@ def Kcline(DeltaK,a):
 
 Fe = 0.57 # fixed by pipette machine
 TAV=0.1 # + 0.3 - 0.1
-dt=0.01
+dt=0.1
  # Total runtime: 500s
 N = int(1.0/dt*500)
 
