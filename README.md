@@ -108,5 +108,4 @@ We would like to make the data and code in this repository available for FAIR us
 
 ## Project status
 
-Completed, mostly....
-
+Completed. Paper published and available at [https://doi.org/10.1038/s41467-026-72366-z](https://doi.org/10.1038/s41467-026-72366-z)
